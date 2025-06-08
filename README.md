@@ -43,8 +43,8 @@ I've created three main profiles that cover most use cases:
 | Profile         | Environment        | Best For           | Key Features                                  |
 | --------------- | ------------------ | ------------------ | --------------------------------------------- |
 | **wsl**         | WSL2 on Windows    | Windows developers | Docker, minimal overhead, Windows integration |
-| **workstation** | Full NixOS desktop | Desktop systems    | Complete DE, GPU support, full dev stack      |
-| **mobile**      | NixOS laptops      | Portable devices   | Power management, hybrid graphics, security   |
+| **workstation** | Native | Desktop systems    | Complete DE, GPU support, full dev stack      |
+| **mobile**      | Native | Mobile devices   | Power management, hybrid graphics, security   |
 
 ## 🛠️ Essential Commands
 
@@ -54,11 +54,16 @@ I've created three main profiles that cover most use cases:
 ./modules/nixos/scripts/switch-profile.sh --current  # Show current profile
 ./modules/nixos/scripts/switch-profile.sh <profile> --dry-run  # Preview changes
 
-# Development
-just dev      # Enter development shell
-just fmt      # Format all code
-just test     # Run comprehensive tests
+just fix      # Format & apply fixes to raised issues
+just check    # Validate flake
+just lint     # Lint the project
+just test     # Run full test against configuration
 just build    # Build system configuration
+just help     # See all commands
+
+# Applying changes
+just nos      # Applies nixosConfiguration (NixOS)
+just nhs      # Applies homeConfiguration (Home Manager)
 
 # Git Profile Management
 git-profile list            # List available git profiles
@@ -90,7 +95,7 @@ Here's what I've documented for you:
 I've organized everything in a logical structure that's easy to navigate:
 
 ```
-nixos-wsl-dotfiles/
+nixos-prodot/
 ├── flake.nix                 # Main flake configuration
 ├── profiles.nix              # System profile definitions
 ├── vars.nix                  # Shared variables and git profiles
@@ -99,29 +104,30 @@ nixos-wsl-dotfiles/
 │   ├── nixos/               # System-level configuration
 │   ├── home-manager/        # User environment configuration
 │   └── shared/              # Shared utilities
-├── docs/                    # Comprehensive documentation
-├── pkgs/                    # Custom packages
-└── tests/                   # Testing and validation
+├── docs/                    # Generated documentation
+└── pkgs/                    # Custom user-defined packages
 ```
 
 ## 🔧 Quick Customization
 
-I've made it easy to customize this configuration for your needs.
+I've made it easy to customize this configuration for your needs. Simply create a new branch and modify [`vars.nix`](vars.nix) with your own system settings. You can further customize your configuration within [`profiles.nix`](profiles.nix) and [`flake.nix`](flake.nix)
 
-### Add a New Profile
+
+### Adding a New Profile
+The pre-built profiles should be sufficient for most use-cases but if you'd like to make your own, all you need to do is define it in [`profiles.nix`](profiles.nix) and update the `selected-profile` to the name of the custom profile in [`vars.nix`](vars.nix).
 
 1. Edit [`profiles.nix`](profiles.nix) to define your profile:
 
    ```nix
-   myprofile = {
+   solarflare = {
      user = { username = "user"; hostname = "my-hostname"; };
      capabilities = { /* define features */ };
    };
    ```
 
-2. Test the new profile:
+2. Test the new profile by updating the `justfile` to reference the custom `#solarflare` profile and running:
    ```bash
-   ./modules/nixos/scripts/switch-profile.sh myprofile --dry-run
+   just test
    ```
 
 ### Add Git Profiles
@@ -137,13 +143,29 @@ gitProfiles = {
 };
 ```
 
+### Where are all the languages?
+This project practices using `nix-direnv` and `flakes` and scoped to their respective projects for isolated and reproducible environments. Therefor what these dotfiles provide are the base settings for getting a development environment going. You will still need to add a `flake.nix` and a `.envrc` to your projects to isolate the environments.
+
+I've provided several [templates](/templates) that can easily be copied to a project and modified for getting up and running.
+
+```bash
+cp ~/.nixos-prodot/templates/nodejs.nix ~/<path-to-your-project>/flake.nix
+echo "use flake" > ~/<path-to-your-project>/.envrc
+cd ~/<path-to-your-project>
+# Modify the ~/<path-to-your-project>/flake.nix to add, remove, etc any additional dependencies
+
+git add flake.nix .envrc
+direnv allow
+```
+
+Your isolated environment is ready with `NodeJS` and `NPM` installed. Don't forget to ignore the `.direnv/` so your project stays clean.
+
 ## 🆘 Need Help?
 
 If you run into any issues, here's how I recommend troubleshooting:
 
-- **Quick Issues**: Check your current profile with `./modules/nixos/scripts/switch-profile.sh --current`
 - **Configuration Problems**: Run `just test` to validate your setup
-- **Detailed Troubleshooting**: I've documented common issues in the [comprehensive documentation](docs/) - just run `just docs`
+- **Detailed Troubleshooting**: I've provided [documentation](docs/) for information regarding this project setup. `just docs # Generates the documentation` `just docs-serve # Start the documentation server`
 - **NixOS Resources**: These official resources are incredibly helpful:
   - [NixOS Manual](https://nixos.org/manual/nixos/stable/)
   - [Home Manager Documentation](https://nix-community.github.io/home-manager/)
@@ -151,7 +173,7 @@ If you run into any issues, here's how I recommend troubleshooting:
 
 ## 🤝 Contributing
 
-I'd love your contributions! Here's how:
+Always happy to have contributers to the dotfiles! Here's how:
 
 1. Make your changes
 2. Run `just fmt` and `just test`
@@ -160,5 +182,3 @@ I'd love your contributions! Here's how:
 For detailed contribution guidelines, see the [Contributing Guide](docs/src/contributing.md) in the comprehensive documentation.
 
 ---
-
-**Ready to start?** Choose your profile above and follow the quick start guide! For detailed information, generate the comprehensive documentation with `just docs`.

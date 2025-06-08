@@ -125,13 +125,14 @@ lint:
 test:
     @echo "[flake]: Running tests..."
     just check
+    just lint
     just build
     @echo "All tests passed"
 
 ## CI/CD
 ci:
     @echo "Running CI pipeline..."
-    just fmt
+    just fix
     just test
     @echo "CI pipeline completed successfully!"
 
