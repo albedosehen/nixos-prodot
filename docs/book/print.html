@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+  <head>
+    <!-- Book generated using mdBook -->
+    <meta charset="UTF-8" />
+    <title>NixOS Profile-Based Dotfile Configuration</title>
+    <meta name="robots" content="noindex" />
+
+    <!-- Custom HTML head -->
+
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="icon" href="favicon.svg" />
+    <link rel="shortcut icon" href="favicon.png" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/general.css" />
+    <link rel="stylesheet" href="css/chrome.css" />
+    <link rel="stylesheet" href="css/print.css" media="print" />
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="FontAwesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+
+    <!-- Highlight.js Stylesheets -->
+    <link rel="stylesheet" id="highlight-css" href="highlight.css" />
+    <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css" />
+    <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css" />
+
+    <!-- Custom theme stylesheets -->
+
+    <!-- Provide site root and default themes to javascript -->
+    <script>
+      const path_to_root = "";
+      const default_light_theme = "navy";
+      const default_dark_theme = "navy";
+    </script>
+    <!-- Start loading toc.js asap -->
+    <script src="toc.js"></script>
+  </head>
+  <body>
+    <div id="body-container">
+      <!-- Work around some values being stored in localStorage wrapped in quotes -->
+      <script>
+        try {
+          let theme = localStorage.getItem("mdbook-theme");
+          let sidebar = localStorage.getItem("mdbook-sidebar");
+
+          if (theme.startsWith('"') && theme.endsWith('"')) {
+            localStorage.setItem(
+              "mdbook-theme",
+              theme.slice(1, theme.length - 1),
+            );
+          }
+
+          if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+            localStorage.setItem(
+              "mdbook-sidebar",
+              sidebar.slice(1, sidebar.length - 1),
+            );
+          }
+        } catch (e) {}
+      </script>
+
+      <!-- Set the theme before any content is loaded, prevents flash -->
+      <script>
+        const default_theme = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? default_dark_theme
+          : default_light_theme;
+        let theme;
+        try {
+          theme = localStorage.getItem("mdbook-theme");
+        } catch (e) {}
+        if (theme === null || theme === undefined) {
+          theme = default_theme;
+        }
+        const html = document.documentElement;
+        html.classList.remove("navy");
+        html.classList.add(theme);
+        html.classList.add("js");
+      </script>
+
+      <input type="checkbox" id="sidebar-toggle-anchor" class="hidden" />
+
+      <!-- Hide / unhide sidebar before it is displayed -->
+      <script>
+        let sidebar = null;
+        const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+        if (document.body.clientWidth >= 1080) {
+          try {
+            sidebar = localStorage.getItem("mdbook-sidebar");
+          } catch (e) {}
+          sidebar = sidebar || "visible";
+        } else {
+          sidebar = "hidden";
+        }
+        sidebar_toggle.checked = sidebar === "visible";
+        html.classList.remove("sidebar-visible");
+        html.classList.add("sidebar-" + sidebar);
+      </script>
+
+      <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+        <!-- populated by js -->
+        <mdbook-sidebar-scrollbox
+          class="sidebar-scrollbox"
+        ></mdbook-sidebar-scrollbox>
+        <noscript>
+          <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+        </noscript>
+        <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+          <div class="sidebar-resize-indicator"></div>
+        </div>
+      </nav>
+
+      <div id="page-wrapper" class="page-wrapper">
+        <div class="page">
+          <div id="menu-bar-hover-placeholder"></div>
+          <div id="menu-bar" class="menu-bar sticky">
+            <div class="left-buttons">
+              <label
+                id="sidebar-toggle"
+                class="icon-button"
+                for="sidebar-toggle-anchor"
+                title="Toggle Table of Contents"
+                aria-label="Toggle Table of Contents"
+                aria-controls="sidebar"
+              >
+                <i class="fa fa-bars"></i>
+              </label>
+              <button
+                id="theme-toggle"
+                class="icon-button"
+                type="button"
+                title="Change theme"
+                aria-label="Change theme"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="theme-list"
+              >
+                <i class="fa fa-paint-brush"></i>
+              </button>
+              <ul
+                id="theme-list"
+                class="theme-popup"
+                aria-label="Themes"
+                role="menu"
+              >
+                <li role="none">
+                  <button role="menuitem" class="theme" id="default_theme">
+                    Auto
+                  </button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="light">
+                    Light
+                  </button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="rust">Rust</button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="coal">Coal</button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="navy">Navy</button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="ayu">Ayu</button>
+                </li>
+              </ul>
+              <button
+                id="search-toggle"
+                class="icon-button"
+                type="button"
+                title="Search. (Shortkey: s)"
+                aria-label="Toggle Searchbar"
+                aria-expanded="false"
+                aria-keyshortcuts="S"
+                aria-controls="searchbar"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <h1 class="menu-title">
+              NixOS Profile-Based Dotfile Configuration
+            </h1>
+
+            <div class="right-buttons">
+              <a
+                href="print.html"
+                title="Print this book"
+                aria-label="Print this book"
+              >
+                <i id="print-button" class="fa fa-print"></i>
+              </a>
+              <a
+                href="https://github.com/albedosehen/nixos-prodot-files"
+                title="Git repository"
+                aria-label="Git repository"
+              >
+                <i id="git-repository-button" class="fa fa-github"></i>
+              </a>
+            </div>
+          </div>
+
+          <div id="search-wrapper" class="hidden">
+            <form id="searchbar-outer" class="searchbar-outer">
+              <input
+                type="search"
+                id="searchbar"
+                name="searchbar"
+                placeholder="Search this book ..."
+                aria-controls="searchresults-outer"
+                aria-describedby="searchresults-header"
+              />
+            </form>
+            <div id="searchresults-outer" class="searchresults-outer hidden">
+              <div id="searchresults-header" class="searchresults-header"></div>
+              <ul id="searchresults"></ul>
+            </div>
+          </div>
+
+          <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+          <script>
+            document
+              .getElementById("sidebar-toggle")
+              .setAttribute("aria-expanded", sidebar === "visible");
+            document
+              .getElementById("sidebar")
+              .setAttribute("aria-hidden", sidebar !== "visible");
+            Array.from(document.querySelectorAll("#sidebar a")).forEach(
+              function (link) {
+                link.setAttribute("tabIndex", sidebar === "visible" ? 0 : -1);
+              },
+            );
+          </script>
+
+          <div id="content" class="content">
+            <main>
+              <h1 id="introduction">
+                <a class="header" href="#introduction">Introduction</a>
+              </h1>
+              <p>
+                Welcome to albedosehen's NixOS Profile-Based Dotfile
+                Configuration system! This documentation covers a comprehensive,
+                modular NixOS configuration that supports multiple computing
+                environments through simple profile management.
+              </p>
+              <h2 id="overview">
+                <a class="header" href="#overview">Overview</a>
+              </h2>
+              <p>This configuration provides three optimized profiles:</p>
+              <ul>
+                <li>
+                  <strong>WSL Profile</strong>: Optimized for WSL2 development
+                  on Windows (Perfect for beginners getting started with NixOS
+                  using WSL2)
+                </li>
+                <li>
+                  <strong>Workstation Profile</strong>: Full-featured NixOS
+                  desktop environment for full workstation capabilities
+                </li>
+                <li>
+                  <strong>Mobile Profile</strong>: Power-optimized configuration
+                  for laptops
+                </li>
+                <li>
+                  <strong>Custom Profiles</strong>: Easily extendable for custom
+                  configurations. Add your own profiles easily by modifying
+                  <code>profiles.nix</code>.
+                </li>
+              </ul>
+              <h2 id="key-features">
+                <a class="header" href="#key-features">Key Features</a>
+              </h2>
+              <ul>
+                <li>
+                  🎯 <strong>Profile-Aware Configuration</strong>: Conditional
+                  module loading based on environment
+                </li>
+                <li>
+                  🔄 <strong>Easy Profile Switching</strong>: Simple
+                  command-line tools for profile management
+                </li>
+                <li>
+                  🧪 <strong>Comprehensive Testing</strong>: Built-in validation
+                  and testing framework
+                </li>
+                <li>
+                  🎨 <strong>Automated Formatting</strong>: Code formatting with
+                  alejandra and prettier
+                </li>
+                <li>
+                  🔍 <strong>Static Analysis</strong>: Linting with statix and
+                  deadnix
+                </li>
+                <li>
+                  🚀 <strong>CI/CD Ready</strong>: GitHub Actions and pre-commit
+                  hooks
+                </li>
+                <li>
+                  📦 <strong>Modular Architecture</strong>: Clean separation of
+                  concerns
+                </li>
+                <li>
+                  ⚡ <strong>Performance Optimized</strong>: Efficient build
+                  caching and binary substitution
+                </li>
+                <li>
+                  🔒 <strong>Security Hardened</strong>: Profile-specific
+                  security configurations
+                </li>
+                <li>
+                  📚 <strong>Living Documentation</strong>: Auto-generated,
+                  profile-aware docs
+                </li>
+              </ul>
+              <h2 id="quick-navigation">
+                <a class="header" href="#quick-navigation">Quick Navigation</a>
+              </h2>
+              <ul>
+                <li>
+                  <strong>Getting Started</strong> Start with
+                  <a href="./installation.html">Installation Guide</a>
+                </li>
+                <li>
+                  <strong>Profile Settings</strong> View
+                  <a href="./profiles.html">Profile Overview</a>
+                </li>
+                <li>
+                  <strong>Profile Switching</strong> View
+                  <a href="./switching.html">Profile Switching</a>
+                </li>
+                <li>
+                  <strong>Development</strong> View
+                  <a href="./development.html">Development</a>
+                </li>
+              </ul>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="profile-overview">
+                <a class="header" href="#profile-overview">Profile Overview</a>
+              </h1>
+              <p>
+                This configuration system uses three distinct profiles to
+                optimize NixOS for different computing environments. Each
+                profile is carefully tuned for its intended use case.
+              </p>
+              <h2 id="available-profiles">
+                <a class="header" href="#available-profiles"
+                  >Available Profiles</a
+                >
+              </h2>
+              <h3 id="wsl-profile-wsl">
+                <a class="header" href="#wsl-profile-wsl"
+                  >WSL Profile (<code>wsl</code>)</a
+                >
+              </h3>
+              <p>
+                <strong>Environment</strong>: WSL2 on Windows
+                <strong>Use Case</strong>: Development environment within
+                Windows
+              </p>
+              <p><strong>Capabilities:</strong></p>
+              <ul>
+                <li>✅ WSL integration and optimizations</li>
+                <li>✅ Docker and containerization tools</li>
+                <li>✅ Full development stack (languages, editors, shells)</li>
+                <li>❌ Desktop environment (uses Windows host)</li>
+                <li>❌ Audio/Bluetooth (managed by Windows)</li>
+                <li>❌ GPU acceleration (uses Windows drivers)</li>
+              </ul>
+              <p><strong>System Configuration:</strong></p>
+              <ul>
+                <li>Hostname: <code>nixos-wsl</code></li>
+                <li>Firewall: Disabled (Windows manages networking)</li>
+                <li>Security: Minimal footprint for development</li>
+                <li>Performance: Optimized for fast development workflows</li>
+              </ul>
+              <h3 id="workstation-profile-workstation">
+                <a class="header" href="#workstation-profile-workstation"
+                  >Workstation Profile (<code>workstation</code>)</a
+                >
+              </h3>
+              <p>
+                <strong>Environment</strong>: Full NixOS desktop installation
+                <strong>Use Case</strong>: Primary desktop workstation with full
+                capabilities
+              </p>
+              <p><strong>Capabilities:</strong></p>
+              <ul>
+                <li>✅ Complete desktop environment</li>
+                <li>✅ NVIDIA GPU support with CUDA</li>
+                <li>✅ Audio (PipeWire) and Bluetooth</li>
+                <li>✅ Full development and gaming stack</li>
+                <li>✅ Docker and Kubernetes</li>
+                <li>✅ Security hardening</li>
+              </ul>
+              <p><strong>System Configuration:</strong></p>
+              <ul>
+                <li>Hostname: <code>nixos-workstation</code></li>
+                <li>Desktop: Full-featured with hardware acceleration</li>
+                <li>Security: Comprehensive hardening</li>
+                <li>Performance: Optimized for high performance computing</li>
+              </ul>
+              <h3 id="mobile-profile-mobile">
+                <a class="header" href="#mobile-profile-mobile"
+                  >Mobile Profile (<code>mobile</code>)</a
+                >
+              </h3>
+              <p>
+                <strong>Environment</strong>: NixOS on laptops and portable
+                devices <strong>Use Case</strong>: Portable development with
+                power optimization
+              </p>
+              <p><strong>Capabilities:</strong></p>
+              <ul>
+                <li>✅ Desktop environment with power optimizations</li>
+                <li>✅ Hybrid NVIDIA graphics (Intel + NVIDIA)</li>
+                <li>✅ Advanced power management (TLP)</li>
+                <li>✅ Audio and Bluetooth</li>
+                <li>✅ Enhanced security (kernel module locking)</li>
+                <li>
+                  ❌ Docker (disabled for battery conservation. Override if
+                  needed)
+                </li>
+              </ul>
+              <p><strong>System Configuration:</strong></p>
+              <ul>
+                <li>Hostname: <code>nixos-mobile</code></li>
+                <li>Power: Aggressive power management and thermal control</li>
+                <li>Security: Maximum security configuration</li>
+                <li>Performance: Battery-optimized with performance modes</li>
+              </ul>
+              <h2 id="profile-selection-guide">
+                <a class="header" href="#profile-selection-guide"
+                  >Profile Selection Guide</a
+                >
+              </h2>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Recommended Profile</th>
+                      <th>Key Benefits</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Windows + WSL2 Development</td>
+                      <td><code>wsl</code></td>
+                      <td>Native Windows integration, minimal overhead</td>
+                    </tr>
+                    <tr>
+                      <td>Linux Gaming/Workstation</td>
+                      <td><code>workstation</code></td>
+                      <td>Full GPU support, maximum performance</td>
+                    </tr>
+                    <tr>
+                      <td>Laptop/Travel Development</td>
+                      <td><code>mobile</code></td>
+                      <td>Extended battery life, thermal management</td>
+                    </tr>
+                    <tr>
+                      <td>Server/Headless Setup</td>
+                      <td>Custom (based on <code>wsl</code>)</td>
+                      <td>Minimal footprint, no desktop</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <h2 id="shared-configuration">
+                <a class="header" href="#shared-configuration"
+                  >Shared Configuration</a
+                >
+              </h2>
+              <p>All profiles share:</p>
+              <ul>
+                <li>Git profile management system</li>
+                <li>Core development tools and languages</li>
+                <li>Security baseline configurations</li>
+                <li>Testing and validation framework</li>
+                <li>Documentation generation</li>
+              </ul>
+              <p>
+                The difference is in capability enablement and optimization
+                focus.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="installation-guide">
+                <a class="header" href="#installation-guide"
+                  >Installation Guide</a
+                >
+              </h1>
+              <p>
+                This guide provides step-by-step instructions for setting up the
+                NixOS configuration across different environments.
+              </p>
+              <h2 id="prerequisites">
+                <a class="header" href="#prerequisites">Prerequisites</a>
+              </h2>
+              <h3 id="for-wsl2-users-windows">
+                <a class="header" href="#for-wsl2-users-windows"
+                  >For WSL2 Users (Windows)</a
+                >
+              </h3>
+              <ol>
+                <li>
+                  <p><strong>Enable WSL2 Features</strong>:</p>
+                  <pre><code class="language-powershell"># Run as Administrator in PowerShell
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+</code></pre>
+                </li>
+                <li>
+                  <p>
+                    <strong>Restart Windows</strong> and set WSL2 as default:
+                  </p>
+                  <pre><code class="language-powershell">wsl --set-default-version 2
+</code></pre>
+                </li>
+                <li>
+                  <p><strong>Install NixOS WSL2</strong>:</p>
+                  <pre><code class="language-powershell"># Option A: Official installer (if available)
+wsl --install nixos
+
+# Option B: Manual installation
+# Download from: https://github.com/nix-community/NixOS-WSL
+# Follow their installation instructions
+</code></pre>
+                </li>
+              </ol>
+              <h3 id="for-native-nixos-users">
+                <a class="header" href="#for-native-nixos-users"
+                  >For Native NixOS Users</a
+                >
+              </h3>
+              <ol>
+                <li>
+                  <p>
+                    <strong>Install NixOS</strong>: Follow the
+                    <a href="https://nixos.org/manual/nixos/stable/"
+                      >official installation guide</a
+                    >
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <strong>Enable Flakes</strong>: Add to
+                    <code>/etc/nixos/configuration.nix</code>:
+                  </p>
+                  <pre><code class="language-nix">nix.settings.experimental-features = [ "nix-command" "flakes" ];
+</code></pre>
+                </li>
+                <li>
+                  <p>
+                    <strong>Rebuild</strong>:
+                    <code>sudo nixos-rebuild switch</code>
+                  </p>
+                </li>
+              </ol>
+              <h2 id="configuration-installation">
+                <a class="header" href="#configuration-installation"
+                  >Configuration Installation</a
+                >
+              </h2>
+              <h3 id="step-1-clone-the-repository">
+                <a class="header" href="#step-1-clone-the-repository"
+                  >Step 1: Clone the Repository</a
+                >
+              </h3>
+              <pre><code class="language-bash">git clone &lt;repository-url&gt; nixos-wsl-dotfiles
+cd nixos-wsl-dotfiles
+</code></pre>
+              <h3 id="step-2-choose-and-apply-profile">
+                <a class="header" href="#step-2-choose-and-apply-profile"
+                  >Step 2: Choose and Apply Profile</a
+                >
+              </h3>
+              <pre><code class="language-bash"># View all available profiles
+./modules/nixos/scripts/switch-profile.sh --list
+
+# Preview profile changes (recommended)
+./modules/nixos/scripts/switch-profile.sh &lt;profile&gt; --dry-run
+
+# Apply profile (choose one):
+./modules/nixos/scripts/switch-profile.sh wsl --rebuild        # For WSL2
+./modules/nixos/scripts/switch-profile.sh workstation --rebuild # For desktop
+./modules/nixos/scripts/switch-profile.sh mobile --rebuild     # For laptop
+</code></pre>
+              <h3 id="step-3-development-environment-setup">
+                <a class="header" href="#step-3-development-environment-setup"
+                  >Step 3: Development Environment Setup</a
+                >
+              </h3>
+              <pre><code class="language-bash"># Enter development shell with all tools
+just dev
+
+# Verify installation
+just check
+just build
+</code></pre>
+              <h2 id="verification">
+                <a class="header" href="#verification">Verification</a>
+              </h2>
+              <p>After installation, verify your setup:</p>
+              <pre><code class="language-bash"># Check current profile
+./modules/nixos/scripts/switch-profile.sh --current
+
+# Verify system build
+sudo nixos-rebuild dry-build --flake .
+
+# Test development environment
+just test
+</code></pre>
+              <h2 id="troubleshooting">
+                <a class="header" href="#troubleshooting">Troubleshooting</a>
+              </h2>
+              <h3 id="common-issues">
+                <a class="header" href="#common-issues">Common Issues</a>
+              </h3>
+              <p><strong>Flakes not enabled</strong>:</p>
+              <pre><code class="language-bash"># Add to ~/.config/nix/nix.conf or /etc/nix/nix.conf
+experimental-features = nix-command flakes
+</code></pre>
+              <p><strong>Permission issues</strong>:</p>
+              <pre><code class="language-bash"># Ensure proper ownership
+sudo chown -R $USER:$USER ~/.config/nix
+</code></pre>
+              <p><strong>WSL-specific issues</strong>:</p>
+              <ul>
+                <li>Ensure WSL2 is properly configured</li>
+                <li>
+                  Check Windows Firewall settings if networking issues occur
+                </li>
+                <li>Restart WSL: <code>wsl --shutdown</code> then restart</li>
+              </ul>
+              <h3 id="getting-help">
+                <a class="header" href="#getting-help">Getting Help</a>
+              </h3>
+              <ul>
+                <li>
+                  Check the <a href="./modules.html">modules documentation</a>
+                </li>
+                <li>
+                  Review <a href="./switching.html">profile switching guide</a>
+                </li>
+                <li>Examine test results: <code>just test</code></li>
+              </ul>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="configuration">
+                <a class="header" href="#configuration">Configuration</a>
+              </h1>
+              <p>
+                This section covers how to configure and customize your NixOS
+                profile-based setup.
+              </p>
+              <h2 id="profile-configuration">
+                <a class="header" href="#profile-configuration"
+                  >Profile Configuration</a
+                >
+              </h2>
+              <p>
+                Profiles are defined in <code>profiles.nix</code> and control
+                which capabilities are enabled for different computing
+                environments.
+              </p>
+              <h3 id="current-profile">
+                <a class="header" href="#current-profile">Current Profile</a>
+              </h3>
+              <p>Check your current profile:</p>
+              <pre><code class="language-bash">./modules/nixos/scripts/switch-profile.sh --current
+</code></pre>
+              <h3 id="switching-profiles">
+                <a class="header" href="#switching-profiles"
+                  >Switching Profiles</a
+                >
+              </h3>
+              <p>
+                See the
+                <a href="./switching.html">Profile Switching Guide</a> for
+                detailed instructions.
+              </p>
+              <h2 id="customization">
+                <a class="header" href="#customization">Customization</a>
+              </h2>
+              <h3 id="adding-custom-packages">
+                <a class="header" href="#adding-custom-packages"
+                  >Adding Custom Packages</a
+                >
+              </h3>
+              <p>
+                Add packages to your profile by editing the appropriate module
+                files:
+              </p>
+              <pre><code class="language-nix"># In modules/shared/pkgs.nix
+environment.systemPackages = with pkgs; [
+  # Add your packages here
+  firefox
+  vscode
+];
+</code></pre>
+              <h3 id="custom-git-profiles">
+                <a class="header" href="#custom-git-profiles"
+                  >Custom Git Profiles</a
+                >
+              </h3>
+              <p>Edit <code>vars.nix</code> to add new git profiles:</p>
+              <pre><code class="language-nix">gitProfiles = {
+  # ... existing profiles
+  custom = {
+    userName = "Your Name";
+    userEmail = "your@email.com";
+    signingKey = null;
+    extraConfig = {};
+  };
+};
+</code></pre>
+              <h3 id="module-configuration">
+                <a class="header" href="#module-configuration"
+                  >Module Configuration</a
+                >
+              </h3>
+              <p>
+                Each profile can enable/disable specific modules. Check the
+                profile definitions in <code>profiles.nix</code> to see which
+                capabilities are available.
+              </p>
+              <h2 id="advanced-configuration">
+                <a class="header" href="#advanced-configuration"
+                  >Advanced Configuration</a
+                >
+              </h2>
+              <h3 id="custom-profiles">
+                <a class="header" href="#custom-profiles">Custom Profiles</a>
+              </h3>
+              <p>
+                Create custom profiles by adding them to
+                <code>profiles.nix</code>:
+              </p>
+              <pre><code class="language-nix">myprofile = {
+  user = { username = "user"; hostname = "my-hostname"; };
+  capabilities = {
+    # Define which features to enable
+    desktop = true;
+    docker = false;
+    # ... other capabilities
+  };
+};
+</code></pre>
+              <h3 id="environment-variables">
+                <a class="header" href="#environment-variables"
+                  >Environment Variables</a
+                >
+              </h3>
+              <p>
+                Set custom environment variables in your profile configuration.
+              </p>
+              <h3 id="service-configuration">
+                <a class="header" href="#service-configuration"
+                  >Service Configuration</a
+                >
+              </h3>
+              <p>
+                Configure systemd services and other system-level settings
+                through the modular configuration system.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="profile-switching-guide">
+                <a class="header" href="#profile-switching-guide"
+                  >Profile Switching Guide</a
+                >
+              </h1>
+              <p>
+                The profile switching system allows you to easily transition
+                between different computing environments while maintaining
+                consistent configurations.
+              </p>
+              <h2 id="profile-switch-script">
+                <a class="header" href="#profile-switch-script"
+                  >Profile Switch Script</a
+                >
+              </h2>
+              <p>
+                The main tool for profile management is
+                <code>./modules/nixos/scripts/switch-profile.sh</code>.
+              </p>
+              <h3 id="basic-usage">
+                <a class="header" href="#basic-usage">Basic Usage</a>
+              </h3>
+              <pre><code class="language-bash"># Show current profile and configuration
+./modules/nixos/scripts/switch-profile.sh --current
+
+# List all available profiles with details
+./modules/nixos/scripts/switch-profile.sh --list
+
+# Preview changes without applying (recommended)
+./modules/nixos/scripts/switch-profile.sh &lt;profile&gt; --dry-run
+
+# Switch profile and rebuild system
+./modules/nixos/scripts/switch-profile.sh &lt;profile&gt; --rebuild
+
+# Switch profile without rebuilding (requires manual rebuild later)
+./modules/nixos/scripts/switch-profile.sh &lt;profile&gt;
+</code></pre>
+              <h3 id="profile-switch-examples">
+                <a class="header" href="#profile-switch-examples"
+                  >Profile Switch Examples</a
+                >
+              </h3>
+              <pre><code class="language-bash"># Switch from any profile to WSL for Windows development
+./modules/nixos/scripts/switch-profile.sh wsl --rebuild
+
+# Move to full workstation setup
+./modules/nixos/scripts/switch-profile.sh workstation --dry-run
+./modules/nixos/scripts/switch-profile.sh workstation --rebuild
+
+# Configure for mobile/laptop use
+./modules/nixos/scripts/switch-profile.sh mobile --rebuild
+</code></pre>
+              <p>
+                For complete switching documentation, see the full guide in the
+                built documentation.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="git-profile-management">
+                <a class="header" href="#git-profile-management"
+                  >Git Profile Management</a
+                >
+              </h1>
+              <p>
+                The git profile system allows you to maintain separate git
+                identities that work across all system profiles.
+              </p>
+              <h2 id="available-git-profiles">
+                <a class="header" href="#available-git-profiles"
+                  >Available Git Profiles</a
+                >
+              </h2>
+              <p>
+                Git profiles are defined in <code>vars.nix</code> and shared
+                across all system profiles.
+              </p>
+              <h2 id="git-profile-commands">
+                <a class="header" href="#git-profile-commands"
+                  >Git Profile Commands</a
+                >
+              </h2>
+              <h3 id="viewing-git-profiles">
+                <a class="header" href="#viewing-git-profiles"
+                  >Viewing Git Profiles</a
+                >
+              </h3>
+              <pre><code class="language-bash"># List all available git profiles
+git-profile list
+
+# Show current active git profile
+git-profile current
+
+# Show current git user configuration
+git whoami
+</code></pre>
+              <h3 id="switching-git-profiles">
+                <a class="header" href="#switching-git-profiles"
+                  >Switching Git Profiles</a
+                >
+              </h3>
+              <pre><code class="language-bash"># Switch to personal profile
+git-profile switch personal
+
+# Switch to work profile
+git-profile switch work
+
+# Verify the switch worked
+git whoami
+</code></pre>
+              <p>
+                For complete git management documentation, see the full guide in
+                the built documentation.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="modules">
+                <a class="header" href="#modules">Modules</a>
+              </h1>
+              <p>
+                This section is under development. Please refer to the source
+                code and existing documentation for more information.
+              </p>
+              <h2 id="coming-soon">
+                <a class="header" href="#coming-soon">Coming Soon</a>
+              </h2>
+              <p>
+                Detailed documentation for this section will be added in future
+                updates.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="development">
+                <a class="header" href="#development">Development</a>
+              </h1>
+              <p>
+                This section is under development. Please refer to the source
+                code and existing documentation for more information.
+              </p>
+              <h2 id="coming-soon-1">
+                <a class="header" href="#coming-soon-1">Coming Soon</a>
+              </h2>
+              <p>
+                Detailed documentation for this section will be added in future
+                updates.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="testing">
+                <a class="header" href="#testing">Testing</a>
+              </h1>
+              <p>
+                This section is under development. Please refer to the source
+                code and existing documentation for more information.
+              </p>
+              <h2 id="coming-soon-2">
+                <a class="header" href="#coming-soon-2">Coming Soon</a>
+              </h2>
+              <p>
+                Detailed documentation for this section will be added in future
+                updates.
+              </p>
+              <div style="break-before: page; page-break-before: always"></div>
+              <h1 id="contributing">
+                <a class="header" href="#contributing">Contributing</a>
+              </h1>
+              <p>
+                This section is under development. Please refer to the source
+                code and existing documentation for more information.
+              </p>
+              <h2 id="coming-soon-3">
+                <a class="header" href="#coming-soon-3">Coming Soon</a>
+              </h2>
+              <p>
+                Detailed documentation for this section will be added in future
+                updates.
+              </p>
+            </main>
+
+            <nav class="nav-wrapper" aria-label="Page navigation">
+              <!-- Mobile navigation buttons -->
+
+              <div style="clear: both"></div>
+            </nav>
+          </div>
+        </div>
+
+        <nav class="nav-wide-wrapper" aria-label="Page navigation"></nav>
+      </div>
+
+      <script>
+        window.playground_copyable = true;
+      </script>
+
+      <script src="elasticlunr.min.js"></script>
+      <script src="mark.min.js"></script>
+      <script src="searcher.js"></script>
+
+      <script src="clipboard.min.js"></script>
+      <script src="highlight.js"></script>
+      <script src="book.js"></script>
+
+      <!-- Custom JS scripts -->
+
+      <script>
+        window.addEventListener("load", function () {
+          window.setTimeout(window.print, 100);
+        });
+      </script>
+    </div>
+  </body>
+</html>

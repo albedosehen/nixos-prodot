@@ -1,0 +1,19 @@
+[book]
+authors = ["albedosehen"]
+language = "en"
+multilingual = false
+src = "src"
+title = "NixOS ProDot Documentation"
+
+[preprocessor.links]
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/albedosehen/nixos-prodot"
+
+[output.html.search]
+enable = true
+
+[output.html.print]
+enable = true
