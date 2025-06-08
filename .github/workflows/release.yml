@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: nix-community
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Build everything
+        run: |
+          nix build .#nixosConfigurations.nixos-wsl.config.system.build.toplevel
+          nix build .#docs
+          nix build .#installer
+          nix build .#update
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Changes
+
+            - Superior NixOS WSL configuration
+            - Comprehensive testing and validation
+            - Automated formatting and linting
+            - Performance optimizations
+            - Security hardening
+
+            ## Installation
+
+            ```bash
+            nix run github:your-org/nixos-wsl-config#installer
+            ```
+          draft: false
+          prerelease: false

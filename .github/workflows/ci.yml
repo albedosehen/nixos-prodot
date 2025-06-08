@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: nix-community
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Check flake
+        run: nix flake check --show-trace
+
+      - name: Format check
+        run: |
+          nix fmt
+          git diff --exit-code
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: nix-community
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Build configuration
+        run: nix build .#nixosConfigurations.nixos-wsl.config.system.build.toplevel
+
+      - name: Build docs
+        run: nix build .#docs
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: nix-community
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Run tests
+        run: nix flake check --show-trace
+
+      - name: Validate configuration
+        run: |
+          nix eval --json .#nixosConfigurations.nixos-wsl.config.system.build.toplevel.drvPath
+          echo "Configuration validation passed!"
