@@ -13,34 +13,34 @@ TEMPLATES_DIR="$PROJECT_ROOT/docs/templates"
 # Template variables for static generation
 TITLE="NixOS ProDot Documentation"
 REPO_URL="https://github.com/albedosehen/nixos-prodot"
-PROFILE_CONTENT=""  # Empty for static generation
+PROFILE_CONTENT="" # Empty for static generation
 
 echo "🔧 Generating docs from templates..."
 
 # Check if templates directory exists
 if [ ! -d "$TEMPLATES_DIR" ]; then
-    echo "❌ Templates directory not found: $TEMPLATES_DIR"
-    echo "   Please ensure the template files exist in docs/templates/"
-    exit 1
+  echo "❌ Templates directory not found: $TEMPLATES_DIR"
+  echo "   Please ensure the template files exist in docs/templates/"
+  exit 1
 fi
 
 mkdir -p "$DOCS_DIR/src"
 
 # Function to substitute template variables
 substitute_template() {
-    local template_file="$1"
-    local output_file="$2"
-    
-    if [ ! -f "$template_file" ]; then
-        echo "❌ Template file not found: $template_file"
-        exit 1
-    fi
-    
-    # Use sed to substitute template variables
-    sed -e "s|{{TITLE}}|$TITLE|g" \
-        -e "s|{{REPO_URL}}|$REPO_URL|g" \
-        -e "s|{{PROFILE_CONTENT}}|$PROFILE_CONTENT|g" \
-        "$template_file" > "$output_file"
+  local template_file="$1"
+  local output_file="$2"
+
+  if [ ! -f "$template_file" ]; then
+    echo "❌ Template file not found: $template_file"
+    exit 1
+  fi
+
+  # Use sed to substitute template variables
+  sed -e "s|{{TITLE}}|$TITLE|g" \
+    -e "s|{{REPO_URL}}|$REPO_URL|g" \
+    -e "s|{{PROFILE_CONTENT}}|$PROFILE_CONTENT|g" \
+    "$template_file" >"$output_file"
 }
 
 # Generate files from templates

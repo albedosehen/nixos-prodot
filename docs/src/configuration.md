@@ -10,6 +10,7 @@ for different computing environments.
 ### Current Profile
 
 Check your current profile:
+
 ```bash
 ./modules/nixos/scripts/switch-profile.sh --current
 ```

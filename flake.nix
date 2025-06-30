@@ -174,7 +174,10 @@
         pkgs = pkgsFor system;
       in {
         docs = pkgs.callPackage ./pkgs/docs.nix {inherit self;};
-        docs-profile = pkgs.callPackage ./pkgs/docs.nix {inherit self; userConfig = currentConfig // {profileName = profile;};};
+        docs-profile = pkgs.callPackage ./pkgs/docs.nix {
+          inherit self;
+          userConfig = currentConfig // {profileName = profile;};
+        };
         docs-local = pkgs.callPackage ./pkgs/docs-local.nix {};
 
         installer = pkgs.writeShellScriptBin "install-nixos-prodot" ''

@@ -45,11 +45,13 @@ The main tool for profile management is `./modules/nixos/scripts/switch-profile.
 ### System Configuration Changes
 
 - **Hostname**: Each profile has a distinct hostname
+
   - `wsl`: `nixos-wsl`
   - `workstation`: `nixos-workstation`
   - `mobile`: `nixos-mobile`
 
 - **Capabilities**: Different features enabled/disabled
+
   - WSL integration (wsl only)
   - Desktop environment (workstation, mobile)
   - GPU acceleration (workstation, mobile)
@@ -101,6 +103,7 @@ profile = "workstation";  # Change to desired profile
 ```
 
 Then rebuild:
+
 ```bash
 sudo nixos-rebuild switch --flake .
 ```
@@ -110,6 +113,7 @@ sudo nixos-rebuild switch --flake .
 Create custom profiles by:
 
 1. **Adding to `profiles.nix`**:
+
    ```nix
    myprofile = {
      user = { username = "user"; hostname = "my-hostname"; };
@@ -119,6 +123,7 @@ Create custom profiles by:
    ```
 
 2. **Testing the profile**:
+
    ```bash
    ./modules/nixos/scripts/switch-profile.sh myprofile --dry-run
    ```
@@ -133,6 +138,7 @@ Create custom profiles by:
 ### Automatic Backups
 
 The switch script automatically creates backups:
+
 - `flake.nix.backup.TIMESTAMP` files are created before each switch
 - Old backups are automatically cleaned up (keeps 3 most recent)
 

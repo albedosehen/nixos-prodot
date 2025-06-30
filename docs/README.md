@@ -10,7 +10,7 @@ I've set up this directory to contain the source files for the NixOS configurati
    just docs-generate
    ```
 
-2. **Edit documentation**: Modify files in `docs/src/` 
+2. **Edit documentation**: Modify files in `docs/src/`
 
 3. **Build HTML documentation**:
 

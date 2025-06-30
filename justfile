@@ -56,7 +56,7 @@ fmt:
 fix:
     nix fmt
     alejandra .
-    statix --fix .
+    statix fix .
 
 check:
     @echo "[flake]: checking configuration"
