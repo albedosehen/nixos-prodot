@@ -33,6 +33,7 @@
     ### Documentation
     mdbook
     pandoc
+    glow
     ### Neovim
     inputs.nixvim.packages.${pkgs.system}.default
   ];
