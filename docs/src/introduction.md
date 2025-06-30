@@ -22,7 +22,7 @@ This configuration provides three optimized profiles:
 - 🔍 **Static Analysis**: Linting with statix and deadnix
 - 🚀 **CI/CD Ready**: GitHub Actions and pre-commit hooks
 - 📦 **Modular Architecture**: Clean separation of concerns
--  ⚡ **Performance Optimized**: Efficient build caching and binary substitution
+- ⚡ **Performance Optimized**: Efficient build caching and binary substitution
 - 🔒 **Security Hardened**: Profile-specific security configurations
 - 📚 **Living Documentation**: Auto-generated, profile-aware docs
 

@@ -40,11 +40,11 @@ cd /etc/nixos/nixos-wsl-dotfiles
 
 I've created three main profiles that cover most use cases:
 
-| Profile         | Environment        | Best For           | Key Features                                  |
-| --------------- | ------------------ | ------------------ | --------------------------------------------- |
-| **wsl**         | WSL2 on Windows    | Windows developers | Docker, minimal overhead, Windows integration |
-| **workstation** | Native | Desktop systems    | Complete DE, GPU support, full dev stack      |
-| **mobile**      | Native | Mobile devices   | Power management, hybrid graphics, security   |
+| Profile         | Environment     | Best For           | Key Features                                  |
+| --------------- | --------------- | ------------------ | --------------------------------------------- |
+| **wsl**         | WSL2 on Windows | Windows developers | Docker, minimal overhead, Windows integration |
+| **workstation** | Native          | Desktop systems    | Complete DE, GPU support, full dev stack      |
+| **mobile**      | Native          | Mobile devices     | Power management, hybrid graphics, security   |
 
 ## 🛠️ Essential Commands
 
@@ -112,8 +112,8 @@ nixos-prodot/
 
 I've made it easy to customize this configuration for your needs. Simply create a new branch and modify [`vars.nix`](vars.nix) with your own system settings. You can further customize your configuration within [`profiles.nix`](profiles.nix) and [`flake.nix`](flake.nix)
 
-
 ### Adding a New Profile
+
 The pre-built profiles should be sufficient for most use-cases but if you'd like to make your own, all you need to do is define it in [`profiles.nix`](profiles.nix) and update the `selected-profile` to the name of the custom profile in [`vars.nix`](vars.nix).
 
 1. Edit [`profiles.nix`](profiles.nix) to define your profile:
@@ -144,6 +144,7 @@ gitProfiles = {
 ```
 
 ### Where are all the languages?
+
 This project practices using `nix-direnv` and `flakes` and scoped to their respective projects for isolated and reproducible environments. Therefor what these dotfiles provide are the base settings for getting a development environment going. You will still need to add a `flake.nix` and a `.envrc` to your projects to isolate the environments.
 
 I've provided several [templates](/templates) that can easily be copied to a project and modified for getting up and running.

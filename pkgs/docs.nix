@@ -34,31 +34,35 @@
   templateVars = {
     TITLE = "NixOS Profile-Based Dotfiles";
     REPO_URL = "https://github.com/albedosehen/nixos-prodot-files";
-    PROFILE_CONTENT = if profileInfo.hasProfile then "\n- [Current Profile](./current-profile.md)" else "";
+    PROFILE_CONTENT =
+      if profileInfo.hasProfile
+      then "\n- [Current Profile](./current-profile.md)"
+      else "";
     CURRENT_PROFILE = profileInfo.profileName;
   };
 
   substituteTemplate = templateFile: outputFile: variables: ''
     substitute "${templateFile}" "${outputFile}" \
-      ${lib.concatStringsSep " \\\n      " (lib.mapAttrsToList (name: value:
-        "--replace '{{${name}}}' ${lib.escapeShellArg value}"
-      ) variables)}
+      ${lib.concatStringsSep " \\\n      " (lib.mapAttrsToList (
+        name: value: "--replace '{{${name}}}' ${lib.escapeShellArg value}"
+      )
+      variables)}
   '';
 
-  currentProfileContent = 
+  currentProfileContent =
     if profileInfo.hasProfile
     then ''
-      # Current Profile Configuration
+          # Current Profile Configuration
 
-      **Active Profile**: ${profileInfo.profileName}
-      **System**: ${profileInfo.username}@${profileInfo.hostname}
+          **Active Profile**: ${profileInfo.profileName}
+          **System**: ${profileInfo.username}@${profileInfo.hostname}
 
-      ## Current Capabilities
-  ${capabilityDocs}
+          ## Current Capabilities
+      ${capabilityDocs}
 
-      ## Profile-Specific Notes
+          ## Profile-Specific Notes
 
-      ${
+          ${
         if profileInfo.profileName == "wsl"
         then ''
           WSL Profile Active
@@ -195,7 +199,7 @@ in
       '';
       license = licenses.mit;
       platforms = platforms.all;
-      maintainers = with maintainers; [ albedosehen ];
+      maintainers = with maintainers; [albedosehen];
       homepage = "https://github.com/albedosehen/nixos-prodot";
     };
   }

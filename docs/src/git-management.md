@@ -9,11 +9,13 @@ contributions.
 Git profiles are defined in `vars.nix` and shared across all system profiles:
 
 ### Personal Profile (Default)
+
 - **Name**: Shon Thomas
 - **Email**: my@email.com
 - **Use Case**: Personal projects and open source contributions
 
 ### Work Profile
+
 - **Name**: Shon Thomas
 - **Email**: mys@company.com
 - **SSH Key**: Uses separate work SSH key (`~/.ssh/work_key`)
@@ -99,6 +101,7 @@ gitProfiles = {
 To add a new git profile:
 
 1. **Edit `vars.nix`**:
+
    ```nix
    gitProfiles = {
      # ... existing profiles
@@ -114,6 +117,7 @@ To add a new git profile:
    ```
 
 2. **Rebuild the system**:
+
    ```bash
    sudo nixos-rebuild switch --flake .
    ```
@@ -130,6 +134,7 @@ To add a new git profile:
 To enable commit signing:
 
 1. **Add GPG key to profile**:
+
    ```nix
    personal = {
      userName = "Your Name";
@@ -143,6 +148,7 @@ To enable commit signing:
    ```
 
 2. **Ensure GPG is configured**:
+
    ```bash
    # Import your GPG key
    gpg --import your-key.asc
@@ -235,6 +241,7 @@ ssh -i ~/.ssh/specific_key -T git@github.com
 ### Profile Persistence
 
 Git profiles persist across:
+
 - Terminal sessions
 - System reboots
 - Profile switches
